@@ -26,7 +26,7 @@ function init() {
     mouseX = event.offsetX;
     mouseY = event.offsetY;
   }
-  canvas.onmousereleace = (event)=>{
+  canvas.onmouseup = (event)=>{
     holding = null;
   };
 }

@@ -1,17 +1,20 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="jp" dir="ltr">
   <head>
     <meta charset="utf-8">
     <title>Voronoi</title>
     <script src="main.js" charset="utf-8"></script>
   </head>
   <body>
+    ボロノイ領域を描画します。中心（白い点）はドラッグで動かせます。<br>
     <canvas id="canvas" width="300" height="300"></canvas><br>
+    距離関数<br>
     <select id="distance-select">
       <option value="manhattan">Manhattan</option>
       <option value="euclid">Euclid</option>
       <option value="other">other</option>
     </select><br>
+    otherを選んだ場合、以下に距離関数を記述してください。（JavaScript）<br>
     <textarea id="distance-function" rows="8" cols="80" disabled></textarea>
   </body>
 </html>

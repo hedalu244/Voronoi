@@ -1,7 +1,10 @@
 var ps = [];
 var colors = [[60, 60, 60], [255, 0, 0], [0, 255, 0], [0, 0, 255], [0, 190, 240], [210, 0, 210], [190, 190, 0]];
 var canvas, ctx;
-var width, height
+var width, height;
+var holding;
+var mouseX, mouseY;
+
 function init() {
   canvas = document.getElementById("canvas");
   ctx = canvas.getContext("2d");
@@ -12,6 +15,30 @@ function init() {
     ps.push([Math.random()* width, Math.random()* height]);
 
   draw();
+
+  canvas.onmousedown = (event)=>{
+    ps.forEach(p => {
+      if(euclid(p, [event.offsetX, event.offsetY]) < 5) holding = p;
+    });
+    update();
+  };
+  canvas.onmousemove = (event)=>{
+    mouseX = event.offsetX;
+    mouseY = event.offsetY;
+  }
+  canvas.onmousereleace = (event)=>{
+    holding = null;
+  };
+}
+
+function update(){
+  if(!holding) return;
+
+  holding[0] = mouseX;
+  holding[1] = mouseY;
+  draw();
+
+  setTimeout(update, 16);
 }
 
 function draw(){
@@ -47,6 +74,9 @@ function nearest(x, d){
 
 function manhattan(a, b){
   return Math.abs(a[0]-b[0])+Math.abs(a[1]-b[1]);
+}
+function euclid(a, b){
+  return Math.sqrt((a[0]-b[0]) * (a[0]-b[0]) + (a[1]-b[1]) * (a[1]-b[1]));
 }
 
 window.onload = init;

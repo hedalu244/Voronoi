@@ -5,6 +5,12 @@ var width, height;
 var holding;
 var mouseX, mouseY;
 
+
+const manhattan = (dx, dy) => Math.abs(dx)+Math.abs(dy);
+const euclid = (dx, dy) => Math.sqrt(dx*dx + dy*dy);
+
+var distance = manhattan;
+
 function init() {
   canvas = document.getElementById("canvas");
   ctx = canvas.getContext("2d");
@@ -12,13 +18,13 @@ function init() {
   height = canvas.height;
 
   for(var i=0; i<colors.length; i++)
-    ps.push([Math.random()* width, Math.random()* height]);
+    ps.push([Math.floor(Math.random()* width), Math.floor(Math.random()* height)]);
 
   draw();
 
   canvas.onmousedown = (event)=>{
     ps.forEach(p => {
-      if(euclid(p, [event.offsetX, event.offsetY]) < 5) holding = p;
+      if(euclid(p[0] - event.offsetX, p[1] - event.offsetY) < 5) holding = p;
     });
     update();
   };
@@ -29,6 +35,36 @@ function init() {
   canvas.onmouseup = (event)=>{
     holding = null;
   };
+
+  document.getElementById("distance-select").onchange = (event) => {
+    // 選択されているoption要素を取得する
+    var selected = event.target.options[event.target.selectedIndex].value;
+    console.log(selected);
+    switch (selected) {
+      default:
+      case "manhattan":
+        distance = manhattan;
+        document.getElementById("distance-function").value = manhattan.toString();
+        document.getElementById("distance-function").disabled = true;
+        break;
+      case "euclid":
+        distance = euclid;
+        document.getElementById("distance-function").value = euclid.toString();
+        document.getElementById("distance-function").disabled = true;
+        break;
+      case "other":
+        document.getElementById("distance-function").disabled = false;
+        distance = eval(document.getElementById("distance-function").value);
+        break;
+    }
+    draw();
+  }
+
+  document.getElementById("distance-function").value = manhattan.toString();
+  document.getElementById("distance-function").oninput = () => {
+    distance = eval(document.getElementById("distance-function").value);
+    draw();
+  }
 }
 
 function update(){
@@ -46,7 +82,7 @@ function draw(){
   for (var y = 0; y < height; y++)
     for (var x = 0; x < width; x++) {
       var i = (x + y * width) * 4;
-      var color = colors[nearest([x, y], manhattan)];
+      var color = colors[nearest([x, y], distance)];
       image_data.data[i] = color[0];
       image_data.data[i + 1] = color[1];
       image_data.data[i + 2] = color[2];
@@ -62,21 +98,14 @@ function draw(){
   });
 }
 
-function nearest(x, d){
+function nearest(p, d){
   var a=0;
-  var min=d(x, ps[a]);
+  var min=d(p[0] - ps[a][0], p[1] - ps[a][1]);
   for(var i=1; i<ps.length; i++) {
-    var b = d(x, ps[i]);
+    var b = d(p[0] - ps[i][0], p[1] - ps[i][1]);
     if(b<min) a=i, min=b;
   }
   return a;
-}
-
-function manhattan(a, b){
-  return Math.abs(a[0]-b[0])+Math.abs(a[1]-b[1]);
-}
-function euclid(a, b){
-  return Math.sqrt((a[0]-b[0]) * (a[0]-b[0]) + (a[1]-b[1]) * (a[1]-b[1]));
 }
 
 window.onload = init;
